@@ -3,7 +3,7 @@
 #include <QDebug>
 
 CustomPlotItem::CustomPlotItem( QQuickItem* parent ) : QQuickPaintedItem( parent )
-    , m_CustomPlot( nullptr ), m_timerId( 0 )
+  , m_CustomPlot( nullptr ), m_timerId( 0 )
 {
     setFlag( QQuickItem::ItemHasContents, true );
     setAcceptedMouseButtons( Qt::AllButtons );
@@ -26,16 +26,28 @@ void CustomPlotItem::initCustomPlot()
 {
     m_CustomPlot = new QCustomPlot();
 
+    QLinearGradient gradient(0, 0, 0, m_CustomPlot->height());
+    gradient.setColorAt(0, QColor(44, 77, 232));
+    gradient.setColorAt(1, QColor(0, 143, 157));
+
     updateCustomPlotSize();
     m_CustomPlot->addGraph();
-    m_CustomPlot->graph( 0 )->setPen( QPen( Qt::red ) );
+    QPen * pen = new QPen(Qt::green);
+    pen->setWidth(2);
+    m_CustomPlot->graph( 0 )->setPen(*pen );
+    m_CustomPlot->setBackground(QBrush(gradient));
     m_CustomPlot->xAxis->setLabel( "t" );
     m_CustomPlot->yAxis->setLabel( "S" );
-    m_CustomPlot->xAxis->setRange( 0, 10 );
+    m_CustomPlot->xAxis->setRange(0, 10);
     m_CustomPlot->yAxis->setRange( 0, 5 );
+    m_CustomPlot->yAxis->grid()->setVisible(true);
+    m_CustomPlot->yAxis->grid()->setPen(QPen( Qt::black));
+
     m_CustomPlot ->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom );
 
-    startTimer(500);
+    verticalLine = new QCPCurve(m_CustomPlot->xAxis, m_CustomPlot->yAxis);
+
+    startTimer(100);
 
     connect( m_CustomPlot, &QCustomPlot::afterReplot, this, &CustomPlotItem::onCustomReplot );
 
@@ -89,6 +101,16 @@ void CustomPlotItem::timerEvent(QTimerEvent *event)
     static double t, U;
     U = ((double)rand() / RAND_MAX) * 5;
     m_CustomPlot->graph(0)->addData(t, U);
+    QVector<double> x;
+    QVector<double> y;
+
+    x.push_back(t);
+    x.push_back(t);
+
+    y.push_back(-50);
+    y.push_back(50);
+
+    verticalLine->setData(x,y);
     qDebug() << Q_FUNC_INFO << QString("Adding dot t = %1, S = %2").arg(t).arg(U);
     t++;
     m_CustomPlot->replot();

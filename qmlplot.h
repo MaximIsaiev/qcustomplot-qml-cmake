@@ -2,6 +2,7 @@
 #define QMLPLOT_H
 
 #include <QtQuick>
+#include <qcustomplot.h>
 class QCustomPlot;
 class QCPAbstractPlottable;
 
@@ -31,6 +32,7 @@ protected:
 
 private:
     QCustomPlot*         m_CustomPlot;
+    QCPCurve*            verticalLine;
     int                  m_timerId;
 
 private slots:
