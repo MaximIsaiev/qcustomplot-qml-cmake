@@ -34,6 +34,8 @@ private:
     QCustomPlot*         m_CustomPlot;
     QCPCurve*            verticalLine;
     int                  m_timerId;
+    QCPGraph*            m_absGraph;
+    QCPGraph*            m_phsGraph;
 
 private slots:
     void graphClicked( QCPAbstractPlottable* plottable );

@@ -1,18 +1,19 @@
 import QtQuick 2.0
 import CustomPlot 1.0
+import QtQuick.Layouts 1.0
 
 Item {
     id: plotForm
 
-    Text {
-        id: text
-        text: qsTr("Plot form")
-    }
-
-    CustomPlotItem {
-        id: customPlot
+    ColumnLayout {
         anchors.fill: parent
 
-        Component.onCompleted: initCustomPlot()
+        CustomPlotItem {
+            id: customPlot
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Component.onCompleted: initCustomPlot()
+        }
     }
 }
