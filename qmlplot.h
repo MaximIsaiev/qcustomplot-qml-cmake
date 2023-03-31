@@ -18,6 +18,14 @@ public:
 
     Q_INVOKABLE void initCustomPlot();
 
+    Q_INVOKABLE void addRange(int left, int right, int index);
+
+    Q_INVOKABLE void paint();
+
+    Q_INVOKABLE void addPost(int left, int right);
+
+    Q_INVOKABLE void reset();
+
 protected:
     void routeMouseEvents( QMouseEvent* event );
     void routeWheelEvents( QWheelEvent* event );
@@ -36,6 +44,10 @@ private:
     int                  m_timerId;
     QCPGraph*            m_absGraph;
     QCPGraph*            m_phsGraph;
+    std::vector<QCPLayoutGrid*> rows;
+    QCPMarginGroup *m_group;
+
+    void setStyleSheet(QCPAxisRect *rect);
 
 private slots:
     void graphClicked( QCPAbstractPlottable* plottable );

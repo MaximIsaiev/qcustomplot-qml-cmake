@@ -26,8 +26,6 @@ void CustomPlotItem::initCustomPlot()
 {
 
     m_CustomPlot = new QCustomPlot();
-    m_CustomPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
-                                  QCP::iSelectLegend | QCP::iSelectPlottables);
 
     QLinearGradient plotGradient;
     plotGradient.setStart(0, 0);
@@ -35,130 +33,99 @@ void CustomPlotItem::initCustomPlot()
     plotGradient.setColorAt(0, QColor(80, 80, 80));
     plotGradient.setColorAt(1, QColor(50, 50, 50));
     m_CustomPlot->setBackground(plotGradient);
+    m_CustomPlot->setInteraction(QCP::iRangeZoom);
 
     m_CustomPlot->plotLayout()->clear();
-    m_CustomPlot->setOpenGl(true);
-
+    m_CustomPlot->plotLayout()->setWrap(0);
+    m_CustomPlot->plotLayout()->setFillOrder(QCPLayoutGrid::foRowsFirst);
 
     QSharedPointer<QCPAxisTicker> xTicker (new QCPAxisTicker);
-    m_CustomPlot->plotLayout()->setRowSpacing(0);
 
+    m_CustomPlot->plotLayout()->setRowSpacing(0);
     m_CustomPlot->plotLayout()->setMargins(QMargins(0,0,0,0));
 
-    auto topRect = new QCPAxisRect(m_CustomPlot, true);
-    m_CustomPlot->plotLayout()->addElement(0,0, topRect);
+    m_group = new QCPMarginGroup(m_CustomPlot);
 
-    topRect->setAutoMargins(QCP::msLeft | QCP::msRight | QCP::msTop);
-    topRect->setMargins(QMargins(0, 0, 0, 0));
+    auto newRange = new QCPAxisRect(m_CustomPlot);
+    setStyleSheet(newRange);
 
-    topRect->axis(QCPAxis::atLeft)->setRange(-2,  50);
+    newRange->setRangeZoom(Qt::Horizontal);
 
-    topRect->axis(QCPAxis::atLeft)->setLabel("ABS");
-    topRect->axis(QCPAxis::atLeft)->setLabelColor(Qt::white);
-    topRect->axis(QCPAxis::atBottom)->setBasePen(QPen(Qt::white, 1));
-    topRect->axis(QCPAxis::atLeft)->setBasePen(QPen(Qt::white, 1));
-    topRect->axis(QCPAxis::atBottom)->setTickPen(QPen(Qt::white, 1));
-    topRect->axis(QCPAxis::atLeft)->setTickPen(QPen(Qt::white, 1));
-
-    topRect->axis(QCPAxis::atBottom)->setSubTickPen(QPen(Qt::white, 1));
-    topRect->axis(QCPAxis::atLeft)->setSubTickPen(QPen(Qt::white, 1));
-    topRect->axis(QCPAxis::atBottom)->setTickLabelColor(Qt::white);
-    topRect->axis(QCPAxis::atLeft)->setTickLabelColor(Qt::white);
-    topRect->axis(QCPAxis::atBottom)->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
-    topRect->axis(QCPAxis::atLeft)->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
-
-     topRect->axis(QCPAxis::atBottom)->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
-    topRect->axis(QCPAxis::atLeft)->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
-     topRect->axis(QCPAxis::atBottom)->grid()->setSubGridVisible(false);
-    topRect->axis(QCPAxis::atLeft)->grid()->setSubGridVisible(false);
-     topRect->axis(QCPAxis::atBottom)->grid()->setZeroLinePen(Qt::NoPen);
-    topRect->axis(QCPAxis::atLeft)->grid()->setZeroLinePen(Qt::NoPen);
-//     topRect->axis(QCPAxis::atBottom)->setUpperEnding(QCPLineEnding::esSpikeArrow);
-//    topRect->axis(QCPAxis::atLeft)->setUpperEnding(QCPLineEnding::esSpikeArrow);
-
-//    auto spaceRect = new QCPAxisRect(m_CustomPlot, true);
-//    m_CustomPlot->plotLayout()->addElement(1, 0, spaceRect);
+    newRange->axis(QCPAxis::atLeft)->setBasePen(Qt::NoPen);
+    newRange->axis(QCPAxis::atLeft)->setTickLabels(false);
 
 
-//    spaceRect->setAutoMargins(QCP::msLeft);
-//    spaceRect->setMargins(QMargins(0, 0, 0, 0));
+    newRange->axis(QCPAxis::atBottom)->setRange(0, 100);
+    auto graph = new QCPGraph(newRange->axis(QCPAxis::atBottom), newRange->axis(QCPAxis::atLeft));
+    QLinearGradient gradient(0, 0, 0, m_CustomPlot->height());
+    gradient.setColorAt(0, QColor(8, 90, 77));
+    gradient.setColorAt(1, QColor(0,0,0,0));
+    graph->setBrush(QBrush(gradient));
+    graph->setPen(QPen(QColor(53, 164, 139)));
+
+    m_CustomPlot->plotLayout()->addElement(newRange);
+    //    topRect->setMarginGroup(QCP::msLeft, group);
+    //    bottomRect->setMarginGroup(QCP::msLeft, group);
+    //    rightTopRect->setMarginGroup(QCP::msLeft, group);
+    //    //    spaceRect->setMarginGroup(QCP::msLeft, group);
+
+    //    auto topRect = new QCPAxisRect(m_CustomPlot, true);
+    //    m_CustomPlot->plotLayout()->addElement(0,0, topRect);
+
+    //    topRect->setAutoMargins(QCP::msAll);
+    //    topRect->setMargins(QMargins(0, 0, 0, 0));
+
+    //    topRect->axis(QCPAxis::atLeft)->setRange(0,  100);
+
+    //    topRect->axis(QCPAxis::atLeft)->setLabel("ABS");
+    //    setStyleSheet(topRect);
+
+    //    auto bottomRect = new QCPAxisRect(m_CustomPlot, true);
+    //    m_CustomPlot->plotLayout()->addElement(1,0, bottomRect);
+
+    //    setStyleSheet(bottomRect);
+
+    //    bottomRect->axis(QCPAxis::atLeft)->setRange(0,  100);
+
+    //    bottomRect->axis(QCPAxis::atLeft)->setLabel("PHS");
+    //    bottomRect->axis(QCPAxis::atLeft)->setLabelColor(Qt::white);
+
+    //    bottomRect->setAutoMargins(QCP::msLeft | QCP::msBottom | QCP::msRight);
+    //    bottomRect->setMargins(QMargins(0, 0, 0, 0));
+
+    //    topRect->axis(QCPAxis::atBottom)->setTicker(xTicker);
+    //    bottomRect->axis(QCPAxis::atBottom)->setTicker(xTicker);
+
+    //    auto rightTopRect = new QCPAxisRect(m_CustomPlot);
+    //    m_CustomPlot->plotLayout()->addElement(0, 1, rightTopRect);
+
+    //    setStyleSheet(rightTopRect);
+
+    //    rightTopRect->axis(QCPAxis::atBottom)->setTicker(xTicker);
+
+    //    rightTopRect->setAutoMargins(QCP::msBottom | QCP::msRight | QCP::msTop);
+    //    rightTopRect->setMargins(QMargins(0, 0, 0, 0));
+
+    //    m_absGraph = m_CustomPlot->addGraph(topRect->axis(QCPAxis::atBottom), topRect->axis(QCPAxis::atLeft));
+    //    m_phsGraph = m_CustomPlot->addGraph(bottomRect->axis(QCPAxis::atBottom), bottomRect->axis(QCPAxis::atLeft));
+
+    //    auto pen = QPen(QColor(10, 140, 70, 255));
+    //    pen.setWidth(2);
+    //    m_absGraph->setPen(pen);
+    //    //    m_absGraph->setBrush(QColor(10, 140, 70, 160));
+
+    //    m_phsGraph->setPen(pen);
+    //    //    m_phsGraph->setBrush(QColor(10, 140, 70, 160));
 
 
-//    spaceRect->axis(QCPAxis::atBottom)->setTicker(xTicker);
-//    spaceRect->axis(QCPAxis::atBottom)->setBasePen(Qt::NoPen);
-//    spaceRect->axis(QCPAxis::atBottom)->setTickLabels(false);
-//    spaceRect->axis(QCPAxis::atBottom)->setTicks(false);
 
-//    spaceRect->removeAxis(spaceRect->axis(QCPAxis::atLeft));
-////    spaceRect->axis(QCPAxis::atLeft)->setTickLabels(false);
-////    spaceRect->axis(QCPAxis::atLeft)->setTicks(false);
-
-    auto bottomRect = new QCPAxisRect(m_CustomPlot, true);
-    m_CustomPlot->plotLayout()->addElement(1,0, bottomRect);
-
-    bottomRect->axis(QCPAxis::atLeft)->setRange(0,  104);
-
-    bottomRect->axis(QCPAxis::atLeft)->setLabel("PHS");
-    bottomRect->axis(QCPAxis::atLeft)->setLabelColor(Qt::white);
-
-    bottomRect->setAutoMargins(QCP::msLeft | QCP::msBottom | QCP::msRight);
-    bottomRect->setMargins(QMargins(0, 0, 0, 0));
-
-    bottomRect->axis(QCPAxis::atBottom)->setBasePen(QPen(Qt::white, 1));
-    bottomRect->axis(QCPAxis::atLeft)->setBasePen(QPen(Qt::white, 1));
-    bottomRect->axis(QCPAxis::atBottom)->setTickPen(QPen(Qt::white, 1));
-    bottomRect->axis(QCPAxis::atLeft)->setTickPen(QPen(Qt::white, 1));
-
-    bottomRect->axis(QCPAxis::atBottom)->setSubTickPen(QPen(Qt::white, 1));
-    bottomRect->axis(QCPAxis::atLeft)->setSubTickPen(QPen(Qt::white, 1));
-    bottomRect->axis(QCPAxis::atBottom)->setTickLabelColor(Qt::white);
-    bottomRect->axis(QCPAxis::atLeft)->setTickLabelColor(Qt::white);
-    bottomRect->axis(QCPAxis::atBottom)->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
-    bottomRect->axis(QCPAxis::atLeft)->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
-
-     bottomRect->axis(QCPAxis::atBottom)->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
-    bottomRect->axis(QCPAxis::atLeft)->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
-     bottomRect->axis(QCPAxis::atBottom)->grid()->setSubGridVisible(false);
-    bottomRect->axis(QCPAxis::atLeft)->grid()->setSubGridVisible(false);
-     bottomRect->axis(QCPAxis::atBottom)->grid()->setZeroLinePen(Qt::NoPen);
-    bottomRect->axis(QCPAxis::atLeft)->grid()->setZeroLinePen(Qt::NoPen);
-//     bottomRect->axis(QCPAxis::atBottom)->setUpperEnding(QCPLineEnding::esSpikeArrow);
-//    bottomRect->axis(QCPAxis::atLeft)->setUpperEnding(QCPLineEnding::esSpikeArrow);
-
-
-    topRect->axis(QCPAxis::atBottom)->setTicker(xTicker);
-    bottomRect->axis(QCPAxis::atBottom)->setTicker(xTicker);
-
-    topRect->axis(QCPAxis::atBottom)->setBasePen(Qt::NoPen);
-    topRect->axis(QCPAxis::atBottom)->setTickLabels(false);
-    topRect->axis(QCPAxis::atBottom)->setTicks(false);
-
-    m_absGraph = m_CustomPlot->addGraph(topRect->axis(QCPAxis::atBottom), topRect->axis(QCPAxis::atLeft));
-    m_phsGraph = m_CustomPlot->addGraph(bottomRect->axis(QCPAxis::atBottom), bottomRect->axis(QCPAxis::atLeft));
-
-    auto pen = QPen(QColor(10, 140, 70, 255));
-    pen.setWidth(2);
-    m_absGraph->setPen(pen);
-//    m_absGraph->setBrush(QColor(10, 140, 70, 160));
-
-    m_phsGraph->setPen(pen);
-//    m_phsGraph->setBrush(QColor(10, 140, 70, 160));
-
-    QCPMarginGroup *group = new QCPMarginGroup(m_CustomPlot);
-    topRect->setMarginGroup(QCP::msLeft, group);
-    bottomRect->setMarginGroup(QCP::msLeft, group);
-//    spaceRect->setMarginGroup(QCP::msLeft, group);
-
-    connect(topRect->axis(QCPAxis::atBottom), SIGNAL(rangeChanged(QCPRange)), bottomRect->axis(QCPAxis::atBottom), SLOT(setRange(QCPRange)));
-    topRect->axis(QCPAxis::atBottom)->setRange(0,  25);
+    ////    connect(topRect->axis(QCPAxis::atBottom), SIGNAL(rangeChanged(QCPRange)), bottomRect->axis(QCPAxis::atBottom), SLOT(setRange(QCPRange)));
+    ////    topRect->axis(QCPAxis::atBottom)->setRange(0,  25);
 
     updateCustomPlotSize();
 
     // replot the plot widget
     m_CustomPlot->replot();
-
-    startTimer(100);
-
 
     //    QLinearGradient gradient(0, 0, 0, m_CustomPlot->height());
     //    gradient.setColorAt(0, QColor(44, 77, 232));
@@ -183,8 +150,89 @@ void CustomPlotItem::initCustomPlot()
 
     //    startTimer(100);
 
-        connect( m_CustomPlot, &QCustomPlot::afterReplot, this, &CustomPlotItem::onCustomReplot );
+    connect( m_CustomPlot, &QCustomPlot::afterReplot, this, &CustomPlotItem::onCustomReplot );
 
+    m_CustomPlot->replot();
+}
+
+void CustomPlotItem::addRange(int left, int right, int index)
+{
+    auto rect = dynamic_cast<QCPAxisRect *>(m_CustomPlot->plotLayout()->element(0,0));
+
+    auto ticks = rect->axis(QCPAxis::atBottom)->tickVector();
+    auto labels = rect->axis(QCPAxis::atBottom)->tickVectorLabels();
+
+    for (int i = left; i <= right; i+=10) {
+        ticks.push_back(ticks.back() + 20);
+        labels.push_back(QString::number(i));
+    }
+
+    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    textTicker->setTickStepStrategy(QCPAxisTickerText::TickStepStrategy::tssReadability);
+    textTicker->addTicks(ticks, labels);
+    rect->axis(QCPAxis::atBottom)->setTicker(textTicker);
+    rect->axis(QCPAxis::atBottom)->setRange(0, right);
+    m_CustomPlot->replot();
+}
+
+void CustomPlotItem::paint()
+{
+    QVector<double> keys;
+    QVector<double> values;
+
+    for (int i = 0; i < 500; i++) {
+        keys.push_back(i);
+        values.push_back(((double)rand() / RAND_MAX) * 5);
+    }
+
+    for (auto && layout : rows) {
+        for (auto && rect : layout->elements(false)){
+            auto rct = dynamic_cast<QCPAxisRect*>(rect);
+
+            for (auto && graph : rct->graphs()) {
+                graph->data().get()->clear();
+                auto range = rct->axis(QCPAxis::atBottom)->range();
+                for (int i = 0; i < keys.size(); i++) {
+                    if (keys.at(i) >= range.lower && keys.at(i) <= range.upper) {
+                        graph->addData(keys.at(i),values.at(i));
+                    }
+                }
+            }
+        }
+    }
+
+    m_CustomPlot->replot();
+}
+
+void CustomPlotItem::addPost(int left, int right)
+{
+    auto newRange = new QCPAxisRect(m_CustomPlot);
+    setStyleSheet(newRange);
+
+    newRange->setRangeZoom(Qt::Horizontal);
+
+    newRange->axis(QCPAxis::atLeft)->setBasePen(Qt::NoPen);
+    newRange->axis(QCPAxis::atLeft)->setTickLabels(false);
+
+
+    newRange->axis(QCPAxis::atBottom)->setRange(left, right);
+    auto graph = new QCPGraph(newRange->axis(QCPAxis::atBottom), newRange->axis(QCPAxis::atLeft));
+    QLinearGradient gradient(0, 0, 0, m_CustomPlot->height());
+    gradient.setColorAt(0, QColor(8, 90, 77));
+    gradient.setColorAt(1, QColor(0,0,0,0));
+    graph->setBrush(QBrush(gradient));
+    graph->setPen(QPen(QColor(53, 164, 139)));
+
+    m_CustomPlot->plotLayout()->addElement(newRange);
+
+//    connect(newRange->axis(QCPAxis::atBottom), &QCPAxis::rangeChanged, this,
+
+    m_CustomPlot->replot();
+}
+
+void CustomPlotItem::reset()
+{
+    m_CustomPlot->rescaleAxes();
     m_CustomPlot->replot();
 }
 
@@ -245,6 +293,28 @@ void CustomPlotItem::timerEvent(QTimerEvent *event)
     if (t > range.upper)
         m_CustomPlot->axisRect(0)->axis(QCPAxis::atBottom)->setRange(range.lower + (t - range.upper), t);
     m_CustomPlot->replot();
+}
+
+void CustomPlotItem::setStyleSheet(QCPAxisRect *rect)
+{
+    rect->axis(QCPAxis::atLeft)->setLabelColor(Qt::white);
+    rect->axis(QCPAxis::atBottom)->setBasePen(QPen(Qt::white, 1));
+    rect->axis(QCPAxis::atLeft)->setBasePen(Qt::NoPen);
+    rect->axis(QCPAxis::atLeft)->setTickLabels(false);
+
+    rect->axis(QCPAxis::atBottom)->setSubTickPen(QPen(Qt::white, 1));
+    rect->axis(QCPAxis::atLeft)->setSubTickPen(Qt::NoPen);
+    rect->axis(QCPAxis::atBottom)->setTickLabelColor(Qt::white);
+    rect->axis(QCPAxis::atLeft)->setTickLabelColor(Qt::white);
+    rect->axis(QCPAxis::atBottom)->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+    rect->axis(QCPAxis::atLeft)->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+
+    rect->axis(QCPAxis::atBottom)->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    rect->axis(QCPAxis::atLeft)->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    rect->axis(QCPAxis::atBottom)->grid()->setSubGridVisible(false);
+    rect->axis(QCPAxis::atLeft)->grid()->setSubGridVisible(false);
+    rect->axis(QCPAxis::atBottom)->grid()->setZeroLinePen(Qt::NoPen);
+    rect->axis(QCPAxis::atLeft)->grid()->setZeroLinePen(Qt::NoPen);
 }
 
 void CustomPlotItem::graphClicked( QCPAbstractPlottable* plottable )

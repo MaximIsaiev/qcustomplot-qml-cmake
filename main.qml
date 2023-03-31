@@ -1,45 +1,89 @@
 import QtQuick 2.7
-import QtQuick.Controls 2.0
-import QtQuick.Layouts 1.0
+import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.3
+import CustomPlot 1.0
 
 ApplicationWindow {
+    id: root
     visible: true
-    width: 640
-    height: 480
+    width: 1280
+    height: 720
     title: qsTr("Hello QCustomPlot in QML")
 
-//    Item {
-//        id: mainView
-//        anchors.fill: parent
-//        PlotView {
-//        }
-//    }
-    SwipeView {
-        id: swipeView
+    RowLayout {
         anchors.fill: parent
-        currentIndex: tabBar.currentIndex
-        interactive: false
 
-        PlotView {
+        CustomPlotItem {
+            id: backend
+            Layout.margins: 10
+            Layout.fillHeight: true
+            Layout.preferredWidth: root.width * 2 / 3
+            Component.onCompleted: initCustomPlot()
         }
 
-        Page {
-            Label {
-                text: qsTr("This is implementation of http://www.qcustomplot.com/index.php/support/forum/172\n" +
-                           "Adding random data on 500 ms tick to plot")
-                anchors.centerIn: parent
+        ColumnLayout {
+            Layout.alignment: Qt.AlignTop
+
+            RowLayout {
+
+                Text {
+                    text: qsTr("От: ")
+                }
+
+                TextField {
+                    id: leftFreq
+                    validator: IntValidator {bottom: 0; top: 500}
+                }
+
+                Text {
+                    text: qsTr("До: ")
+                }
+
+                TextField {
+                    id: rightFreq
+                    validator: IntValidator {bottom: 0; top: 500}
+                }
             }
-        }
-    }
+            RowLayout {
+                Button {
+                    Layout.alignment: Qt.AlignTop
+                    Layout.rightMargin: 10
+                    Layout.fillWidth: true
+                    height: 30
+                    text: qsTr("Add range")
 
-    footer: TabBar {
-        id: tabBar
-        currentIndex: swipeView.currentIndex
-        TabButton {
-            text: qsTr("Plot")
-        }
-        TabButton {
-            text: qsTr("Info")
+                    onClicked: backend.addRange(Number(leftFreq.text), Number(rightFreq.text), 0)
+                }
+
+                Button {
+                    Layout.alignment: Qt.AlignTop
+                    Layout.rightMargin: 10
+                    Layout.fillWidth: true
+                    height: 30
+                    text: qsTr("Add post")
+
+                    onClicked: backend.addPost()
+                }
+
+                Button {
+                    Layout.alignment: Qt.AlignTop
+                    Layout.rightMargin: 10
+                    Layout.fillWidth: true
+                    height: 30
+                    text: qsTr("Paint")
+
+                    onClicked: backend.paint()
+                }
+            }
+            Button {
+                Layout.alignment: Qt.AlignTop
+                Layout.rightMargin: 10
+                Layout.fillWidth: true
+                height: 30
+                text: qsTr("Reset Zoom")
+
+                onClicked: backend.reset()
+            }
         }
     }
 }

@@ -5,15 +5,9 @@ import QtQuick.Layouts 1.0
 Item {
     id: plotForm
 
-    ColumnLayout {
-        anchors.fill: parent
-
-        CustomPlotItem {
-            id: customPlot
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Component.onCompleted: initCustomPlot()
-        }
+    CustomPlotItem {
+        id: customPlot
+        anchors.fill: plotForm
+        Component.onCompleted: initCustomPlot()
     }
 }
