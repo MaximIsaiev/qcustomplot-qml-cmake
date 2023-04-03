@@ -3,6 +3,7 @@
 
 #include <QtQuick>
 #include <qcustomplot.h>
+#include <rangeaxisticker.h>
 class QCustomPlot;
 class QCPAbstractPlottable;
 
@@ -46,6 +47,7 @@ private:
     QCPGraph*            m_phsGraph;
     std::vector<QCPLayoutGrid*> rows;
     QCPMarginGroup *m_group;
+    QSharedPointer<RangeAxisTicker> m_ticker;
 
     void setStyleSheet(QCPAxisRect *rect);
 

@@ -6,7 +6,8 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     qcustomplot.cpp \
-    qmlplot.cpp
+    qmlplot.cpp \
+    rangeaxisticker.cpp
 
 RESOURCES += qml.qrc
 
@@ -34,4 +35,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     qcustomplot.h \
-    qmlplot.h
+    qmlplot.h \
+    rangeaxisticker.h

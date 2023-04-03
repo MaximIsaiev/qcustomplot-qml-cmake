@@ -1,5 +1,5 @@
 import QtQuick 2.7
-import QtQuick.Controls 2.12
+import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 import CustomPlot 1.0
 
@@ -10,14 +10,14 @@ ApplicationWindow {
     height: 720
     title: qsTr("Hello QCustomPlot in QML")
 
-    RowLayout {
+    ColumnLayout {
         anchors.fill: parent
 
         CustomPlotItem {
             id: backend
             Layout.margins: 10
-            Layout.fillHeight: true
-            Layout.preferredWidth: root.width * 2 / 3
+            Layout.preferredHeight: root.height * 1 / 3
+            Layout.fillWidth: true
             Component.onCompleted: initCustomPlot()
         }
 

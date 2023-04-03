@@ -1,5 +1,6 @@
 #include "qmlplot.h"
 #include "qcustomplot.h"
+#include "rangeaxisticker.h"
 #include <QDebug>
 
 CustomPlotItem::CustomPlotItem( QQuickItem* parent ) : QQuickPaintedItem( parent )
@@ -46,24 +47,25 @@ void CustomPlotItem::initCustomPlot()
 
     m_group = new QCPMarginGroup(m_CustomPlot);
 
-    auto newRange = new QCPAxisRect(m_CustomPlot);
-    setStyleSheet(newRange);
+    //    auto newRange = new QCPAxisRect(m_CustomPlot);
+    //    setStyleSheet(newRange);
 
-    newRange->setRangeZoom(Qt::Horizontal);
+    //    newRange->setRangeZoom(Qt::Horizontal);
 
-    newRange->axis(QCPAxis::atLeft)->setBasePen(Qt::NoPen);
-    newRange->axis(QCPAxis::atLeft)->setTickLabels(false);
+    //    newRange->axis(QCPAxis::atLeft)->setBasePen(Qt::NoPen);
+    //    newRange->axis(QCPAxis::atLeft)->setTickLabels(false);
 
 
-    newRange->axis(QCPAxis::atBottom)->setRange(0, 100);
-    auto graph = new QCPGraph(newRange->axis(QCPAxis::atBottom), newRange->axis(QCPAxis::atLeft));
+    //    newRange->axis(QCPAxis::atBottom)->setRange(0, 5);
+    //    auto graph = new QCPGraph(newRange->axis(QCPAxis::atBottom), newRange->axis(QCPAxis::atLeft));
     QLinearGradient gradient(0, 0, 0, m_CustomPlot->height());
     gradient.setColorAt(0, QColor(8, 90, 77));
     gradient.setColorAt(1, QColor(0,0,0,0));
-    graph->setBrush(QBrush(gradient));
-    graph->setPen(QPen(QColor(53, 164, 139)));
 
-    m_CustomPlot->plotLayout()->addElement(newRange);
+    //    graph->setBrush(QBrush(gradient));
+    //    graph->setPen(QPen(QColor(53, 164, 139)));
+
+    //    m_CustomPlot->plotLayout()->addElement(newRange);
     //    topRect->setMarginGroup(QCP::msLeft, group);
     //    bottomRect->setMarginGroup(QCP::msLeft, group);
     //    rightTopRect->setMarginGroup(QCP::msLeft, group);
@@ -157,21 +159,85 @@ void CustomPlotItem::initCustomPlot()
 
 void CustomPlotItem::addRange(int left, int right, int index)
 {
-    auto rect = dynamic_cast<QCPAxisRect *>(m_CustomPlot->plotLayout()->element(0,0));
 
-    auto ticks = rect->axis(QCPAxis::atBottom)->tickVector();
-    auto labels = rect->axis(QCPAxis::atBottom)->tickVectorLabels();
+    //      auto newRange = new QCPAxisRect(m_CustomPlot);
+    //      setStyleSheet(newRange);
+    //      newRange->axis(QCPAxis::atLeft)->setTickLabels(false);
+    //      newRange->axis(QCPAxis::atBottom)->setRange(left, right);
+    //      m_CustomPlot->plotLayout()->addElement(newRange);
+    if (m_CustomPlot->plotLayout()->elementCount() == 0) {
+        auto newRange = new QCPAxisRect(m_CustomPlot);
+        setStyleSheet(newRange);
 
-    for (int i = left; i <= right; i+=10) {
-        ticks.push_back(ticks.back() + 20);
-        labels.push_back(QString::number(i));
+        newRange->setRangeZoom(Qt::Horizontal);
+
+        newRange->axis(QCPAxis::atLeft)->setBasePen(Qt::NoPen);
+        newRange->axis(QCPAxis::atLeft)->setTickLabels(false);
+
+
+        m_ticker = QSharedPointer<RangeAxisTicker>(new RangeAxisTicker());
+        m_ticker->addTicks(QCPRange(left, right));
+        newRange->axis(QCPAxis::atBottom)->setTicker(m_ticker);
+        m_CustomPlot->plotLayout()->addElement(newRange);
+
+
+//        QCPItemRect *rectLegend = new QCPItemRect(m_CustomPlot);
+//        rectLegend->bottomRight->setCoords(right, newRange->axis(QCPAxis::atLeft)->range().upper - 0.5);
+//        rectLegend->topLeft->setCoords(left, newRange->axis(QCPAxis::atLeft)->range().upper);
+//        rectLegend->setBrush(QBrush(Qt::white));
+//        rectLegend->setPen(QPen(Qt::black));
+
+//        QCPItemText *textLabel = new QCPItemText(m_CustomPlot);
+//        textLabel->position->setCoords(left + (right - left) / 2, newRange->axis(QCPAxis::atLeft)->range().upper - 0.25);
+//        textLabel->setText(QString::number(left) + "-" + QString::number(right));
+//        textLabel->setBrush(QBrush(Qt::NoBrush));
+//        textLabel->setPen(QPen(Qt::NoPen)); // show black border around text
+
+        m_CustomPlot->replot();
+
+
+        return;
     }
 
-    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
-    textTicker->setTickStepStrategy(QCPAxisTickerText::TickStepStrategy::tssReadability);
-    textTicker->addTicks(ticks, labels);
-    rect->axis(QCPAxis::atBottom)->setTicker(textTicker);
-    rect->axis(QCPAxis::atBottom)->setRange(0, right);
+    auto rect = dynamic_cast<QCPAxisRect *>(m_CustomPlot->plotLayout()->element(0,0));
+
+    m_ticker->addTicks(QCPRange(left, right));
+//    auto labels = rect->axis(QCPAxis::atBottom)->tickVectorLabels();
+
+//    QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+//    textTicker->addTicks(ticks, labels);
+
+//    QCPItemLine *line = new QCPItemLine(m_CustomPlot);
+//    line->start->setCoords(ticks.back(), rect->axis(QCPAxis::atLeft)->range().lower);
+//    line->end->setCoords(ticks.back(), rect->axis(QCPAxis::atLeft)->range().upper);
+
+//    QVector<double> newTicks;
+//    QVector<QString> newLabels;
+
+//    for (int i = ticks.back(); i <= ticks.back() + (right - left); i+=4) {
+//        newTicks.push_back(i);
+//        newLabels.push_back(QString::number(left + i - ticks.back()));
+//    }
+
+//    textTicker->addTicks(newTicks, newLabels);
+//    textTicker->setTickOrigin(left);
+
+//    rect->axis(QCPAxis::atBottom)->setTicker(textTicker);
+//    rect->axis(QCPAxis::atBottom)->setRange(ticks.first(), newTicks.back());
+
+
+    //    QCPItemRect *rectLegend = new QCPItemRect(m_CustomPlot);
+    //    rectLegend->bottomRight->setCoords(newTicks.back(), rect->axis(QCPAxis::atLeft)->range().upper - 0.5);
+    //    rectLegend->topLeft->setCoords(newTicks.first(), rect->axis(QCPAxis::atLeft)->range().upper);
+    //    rectLegend->setBrush(QBrush(Qt::white));
+    //    rectLegend->setPen(QPen(Qt::black));
+
+    //    QCPItemText *textLabel = new QCPItemText(m_CustomPlot);
+    //    textLabel->position->setCoords(newTicks.first() + (right - left) / 2, rect->axis(QCPAxis::atLeft)->range().upper - 0.25);
+    //    textLabel->setText(QString::number(left) + "-" + QString::number(right));
+    //    textLabel->setBrush(QBrush(Qt::white));
+    //    textLabel->setPen(QPen(Qt::white));
+
     m_CustomPlot->replot();
 }
 
@@ -180,27 +246,38 @@ void CustomPlotItem::paint()
     QVector<double> keys;
     QVector<double> values;
 
+
+
+    auto rect = dynamic_cast<QCPAxisRect*>(m_CustomPlot->plotLayout()->element(0,0));
+//    auto rect = new QCPAxisRect(m_CustomPlot);
+    auto graph = new QCPCurve(rect->axis(QCPAxis::atBottom), rect->axis(QCPAxis::atLeft));
+
     for (int i = 0; i < 500; i++) {
         keys.push_back(i);
-        values.push_back(((double)rand() / RAND_MAX) * 5);
+        values.push_back((sin(i / 6.28) * 2) + 2);
     }
 
-    for (auto && layout : rows) {
-        for (auto && rect : layout->elements(false)){
-            auto rct = dynamic_cast<QCPAxisRect*>(rect);
+    QSharedPointer<QCPAxisTickerDateTime> dateTicker (new QCPAxisTickerDateTime);
+    rect->axis(QCPAxis::atBottom)->setTicker(dateTicker);
+    graph->setData(keys, values);
 
-            for (auto && graph : rct->graphs()) {
-                graph->data().get()->clear();
-                auto range = rct->axis(QCPAxis::atBottom)->range();
-                for (int i = 0; i < keys.size(); i++) {
-                    if (keys.at(i) >= range.lower && keys.at(i) <= range.upper) {
-                        graph->addData(keys.at(i),values.at(i));
-                    }
-                }
-            }
-        }
-    }
+//    for (auto && layout : rows) {
+//        for (auto && rect : layout->elements(false)){
+//            auto rct = dynamic_cast<QCPAxisRect*>(rect);
 
+//            for (auto && graph : rct->graphs()) {
+//                graph->data().get()->clear();
+//                auto range = rct->axis(QCPAxis::atBottom)->range();
+//                for (int i = 0; i < keys.size(); i++) {
+//                    if (keys.at(i) >= range.lower && keys.at(i) <= range.upper) {
+//                        graph->addData(keys.at(i),values.at(i));
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    m_CustomPlot->plotLayout()->addElement(rect);
     m_CustomPlot->replot();
 }
 
@@ -225,7 +302,7 @@ void CustomPlotItem::addPost(int left, int right)
 
     m_CustomPlot->plotLayout()->addElement(newRange);
 
-//    connect(newRange->axis(QCPAxis::atBottom), &QCPAxis::rangeChanged, this,
+    //    connect(newRange->axis(QCPAxis::atBottom), &QCPAxis::rangeChanged, this,
 
     m_CustomPlot->replot();
 }
