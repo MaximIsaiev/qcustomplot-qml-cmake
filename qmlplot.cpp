@@ -190,6 +190,7 @@ void CustomPlotItem::addRange(int left, int right, int index)
         connect(newRange->axis(QCPAxis::atBottom), static_cast<void (QCPAxis::*)(const QCPRange&)>(&QCPAxis::rangeChanged), this, [this](const QCPRange & range) {
             if (range.lower < m_rangeData.front().ticks.first())
                 reset();
+            zoomSynchronization(range);
         });
 
         m_CustomPlot->plotLayout()->addElement(newRange);
