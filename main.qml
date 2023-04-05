@@ -16,7 +16,7 @@ ApplicationWindow {
         CustomPlotItem {
             id: backend
             Layout.margins: 10
-            Layout.preferredHeight: root.height * 1 / 3
+            Layout.fillHeight: true
             Layout.fillWidth: true
             Component.onCompleted: initCustomPlot()
         }

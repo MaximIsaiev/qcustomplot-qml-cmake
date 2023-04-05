@@ -7,6 +7,14 @@
 class QCustomPlot;
 class QCPAbstractPlottable;
 
+struct FrequencyRangeImpl {
+    QVector<double> ticks;
+    QVector<QString> labels;
+    double leftFrequency;
+    double rightFrequency;
+    double filter;
+};
+
 class CustomPlotItem : public QQuickPaintedItem
 {
     Q_OBJECT
@@ -23,7 +31,7 @@ public:
 
     Q_INVOKABLE void paint();
 
-    Q_INVOKABLE void addPost(int left, int right);
+    Q_INVOKABLE void addPost();
 
     Q_INVOKABLE void reset();
 
@@ -45,9 +53,9 @@ private:
     int                  m_timerId;
     QCPGraph*            m_absGraph;
     QCPGraph*            m_phsGraph;
-    std::vector<QCPLayoutGrid*> rows;
+    std::vector<QCPAxisRect*> rows;
     QCPMarginGroup *m_group;
-    QSharedPointer<RangeAxisTicker> m_ticker;
+    std::vector<FrequencyRangeImpl> m_rangeData;
 
     void setStyleSheet(QCPAxisRect *rect);
 
@@ -55,6 +63,7 @@ private slots:
     void graphClicked( QCPAbstractPlottable* plottable );
     void onCustomReplot();
     void updateCustomPlotSize();
+    void zoomSynchronization(const QCPRange & range);
 
 };
 
