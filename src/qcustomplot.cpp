@@ -23,7 +23,7 @@
 **          Version: 2.1.1                                                **
 ****************************************************************************/
 
-#include "qcustomplot.h"
+#include "include/qcustomplot.h"
 
 
 /* including file 'src/vector2d.cpp'       */
@@ -929,8 +929,9 @@ void QCPPaintBufferGlFbo::clear(const QColor &color)
   if (QOpenGLContext::currentContext() != context.data())
     context->makeCurrent(context->surface());
   mGlFrameBuffer->bind();
-  glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+  f->glClearColor(color.redF(), color.greenF(), color.blueF(), color.alphaF());
+  f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   mGlFrameBuffer->release();
 }
 
@@ -15113,7 +15114,7 @@ void QCustomPlot::deselectAll()
   replot only that specific layer via \ref QCPLayer::replot. See the documentation there for
   details.
   
-  \see replotTime
+  \see m_replotTime
 */
 void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
 {

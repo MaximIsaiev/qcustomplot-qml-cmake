@@ -3,7 +3,7 @@
 #include<QApplication>
 #include <QQmlApplicationEngine>
 
-#include "qmlplot.h"
+#include "include/qmlplot.h"
 
 int main(int argc, char *argv[])
 {

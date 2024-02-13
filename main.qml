@@ -6,8 +6,8 @@ import CustomPlot 1.0
 ApplicationWindow {
     id: root
     visible: true
-    width: 1280
-    height: 720
+    width: 1600
+    height: 900
     title: qsTr("Hello QCustomPlot in QML")
 
     ColumnLayout {
@@ -23,46 +23,28 @@ ApplicationWindow {
 
         ColumnLayout {
             Layout.alignment: Qt.AlignTop
+            Layout.margins: 10
 
             RowLayout {
 
                 Text {
-                    text: qsTr("От: ")
+                    text: qsTr("Время отрисовки графика: ")
                 }
 
                 TextField {
                     id: leftFreq
-                    validator: IntValidator {bottom: 0; top: 500}
+                    readOnly: true
+                    text: backend.replotTime
                 }
 
                 Text {
-                    text: qsTr("До: ")
+                    text: qsTr("Время отрисовки кадра: ")
                 }
 
                 TextField {
                     id: rightFreq
-                    validator: IntValidator {bottom: 0; top: 500}
-                }
-            }
-            RowLayout {
-                Button {
-                    Layout.alignment: Qt.AlignTop
-                    Layout.rightMargin: 10
-                    Layout.fillWidth: true
-                    height: 30
-                    text: qsTr("Add range")
-
-                    onClicked: backend.addRange(Number(leftFreq.text), Number(rightFreq.text), 0)
-                }
-
-                Button {
-                    Layout.alignment: Qt.AlignTop
-                    Layout.rightMargin: 10
-                    Layout.fillWidth: true
-                    height: 30
-                    text: qsTr("Add post")
-
-                    onClicked: backend.addPost()
+                    readOnly: true
+                    text: backend.repaintTime
                 }
 
                 Button {
@@ -74,15 +56,7 @@ ApplicationWindow {
 
                     onClicked: backend.paint()
                 }
-            }
-            Button {
-                Layout.alignment: Qt.AlignTop
-                Layout.rightMargin: 10
-                Layout.fillWidth: true
-                height: 30
-                text: qsTr("Reset Zoom")
 
-                onClicked: backend.reset()
             }
         }
     }
