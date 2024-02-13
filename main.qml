@@ -46,17 +46,42 @@ ApplicationWindow {
                     readOnly: true
                     text: backend.repaintTime
                 }
+            }
 
-                Button {
-                    Layout.alignment: Qt.AlignTop
-                    Layout.rightMargin: 10
-                    Layout.fillWidth: true
-                    height: 30
-                    text: qsTr("Paint")
+            RowLayout {
 
-                    onClicked: backend.paint()
+                Switch {
+                    text: qsTr("OpenGl")
+                    checked: backend.openGl
+                    onCheckedChanged: backend.openGl = checked
                 }
 
+                Switch {
+                    text: qsTr("Pixmap paint")
+                    checked: backend.pixmapPaint
+                    onCheckedChanged: backend.pixmapPaint = checked
+                }
+
+            }
+
+            RowLayout {
+                Text {
+                    text: qsTr("Число точек: ")
+                }
+
+                TextField {
+                    id: digits
+
+                    placeholderText: qsTr("Input number")
+                    text: backend.pointCount
+                    onTextChanged: backend.pointCount = parseFloat(text)
+                    inputMethodHints: Qt.ImhDigitsOnly
+                }
+            }
+
+            Switch {
+                text: qsTr("Рисовать")
+                onCheckedChanged: backend.paint(checked)
             }
         }
     }

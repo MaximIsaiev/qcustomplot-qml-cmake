@@ -1,66 +1,53 @@
-#ifndef QMLPLOT_H
-#define QMLPLOT_H
+#pragma once
 
 #include <QtQuick>
 #include "include/qcustomplot.h"
 
-static const int size1 = 2000;
-
 class QCustomPlot;
 class QCPAbstractPlottable;
-
-struct FrequencyRangeImpl {
-    QVector<double> ticks;
-    QVector<QString> labels;
-    double leftFrequency;
-    double rightFrequency;
-    double filter;
-};
-
-class ThreadWorker : public QObject
-{
-public:
-    explicit ThreadWorker(QObject *parent = nullptr) : QObject(parent) {}
-    ~ThreadWorker() override = default;
-
-    static void doWork(int i) {
-        while (i < 10000) {
-            i++;
-            qDebug() << i;
-        }
-        qDebug() << "end";
-    }
-
-};
 
 class CustomPlotItem : public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(QString replotTime READ replotTime WRITE setReplotTime NOTIFY replotTimeChanged)
     Q_PROPERTY(QString repaintTime READ repaintTime WRITE setRepaintTime NOTIFY repaintTimeChanged)
+    Q_PROPERTY(bool openGl READ openGl WRITE setOpenGl NOTIFY openGlChanged)
+    Q_PROPERTY(bool pixmapPaint READ pixmapPaint WRITE setPixmapPaint NOTIFY pixmapPaintChanged)
+    Q_PROPERTY(int pointCount READ pointCount WRITE setPointCount NOTIFY pointCountChanged)
 
 public:
-    CustomPlotItem( QQuickItem* parent = 0 );
-    virtual ~CustomPlotItem();
+    explicit CustomPlotItem(QQuickItem* parent = nullptr);
+    ~CustomPlotItem() override;
 
-    void paint( QPainter* painter );
+    void paint( QPainter* painter ) override;
 
     Q_INVOKABLE void initCustomPlot();
 
-    Q_INVOKABLE void addRange(int left, int right);
+    Q_INVOKABLE void paint(bool paint);
 
-    Q_INVOKABLE void paint();
+    const QString &replotTime() const;
+    void setReplotTime(const QString &replotTime);
 
-    Q_INVOKABLE void addPost();
+    const QString &repaintTime() const;
+    void setRepaintTime(const QString &repaintTime);
 
-    Q_INVOKABLE void reset();
+    bool openGl() const;
+    void setOpenGl(bool mOpenGl);
+
+    bool pixmapPaint() const;
+    void setPixmapPaint(bool mPixmapPaint);
+
+    int pointCount() const;
+    void setPointCount(int mPointCount);
 
 signals:
-    void needWork(int i);
     void needData();
     void needCustomReplot();
     void replotTimeChanged();
     void repaintTimeChanged();
+    void openGlChanged();
+    void pixmapPaintChanged();
+    void pointCountChanged();
 
 protected:
     void routeMouseEvents( QMouseEvent* event );
@@ -72,48 +59,20 @@ protected:
     virtual void mouseDoubleClickEvent( QMouseEvent* event );
     virtual void wheelEvent( QWheelEvent *event );
 
-    virtual void timerEvent(QTimerEvent *event);
-
 private:
-    QCustomPlot*         m_CustomPlot;
-    QCPCurve*            verticalLine;
-    int                  m_timerId;
-    QCPGraph*            m_absGraph;
-    QCPGraph*            m_phsGraph;
-    std::vector<QCPAxisRect*> rows;
-    QCPMarginGroup *m_group;
-    std::vector<FrequencyRangeImpl> m_rangeData;
-    QThread thread1;
-    QThread thread2;
-    std::unique_ptr<ThreadWorker> worker1;
-    std::unique_ptr<ThreadWorker> worker2;
+    QCustomPlot* m_CustomPlot;
     QTimer dataTimer;
     QVector<double> m_keys;
     QVector<double> m_values;
-    QPixmap grabPixmap;
     QString m_replotTime;
     QString m_repaintTime;
-public:
-    const QString &replotTime() const;
-
-    void setReplotTime(const QString &replotTime);
-
-    const QString &repaintTime() const;
-
-    void setRepaintTime(const QString &repaintTime);
-
-private:
-
-
-    void setStyleSheet(QCPAxisRect *rect);
+    int m_pointCount {1024};
+    bool m_pixmapPaint {false};
+    bool m_needPaint {true};
 
 private slots:
-    void graphClicked( QCPAbstractPlottable* plottable );
     void onCustomReplot();
     void updateCustomPlotSize();
-    void zoomSynchronization(const QCPRange & range);
     void realtimeDataSlot();
 
 };
-
-#endif // QMLPLOT_H
