@@ -21,6 +21,7 @@ public:
 
     void paint( QPainter* painter ) override;
 
+    Q_INVOKABLE void replot();
     Q_INVOKABLE void initCustomPlot();
 
     Q_INVOKABLE void paint(bool paint);
@@ -66,6 +67,7 @@ private:
     QVector<double> m_values;
     QString m_replotTime;
     QString m_repaintTime;
+    QFutureWatcher<void> m_futureWatcher;
     int m_pointCount {1024};
     bool m_pixmapPaint {false};
     bool m_needPaint {true};

@@ -15118,55 +15118,10 @@ void QCustomPlot::deselectAll()
 */
 void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
 {
-  if (refreshPriority == QCustomPlot::rpQueuedReplot)
-  {
-    if (!mReplotQueued)
-    {
-      mReplotQueued = true;
-      QTimer::singleShot(0, this, SLOT(replot()));
-    }
-    return;
-  }
-  
-  if (mReplotting) // incase signals loop back to replot slot
-    return;
-  mReplotting = true;
-  mReplotQueued = false;
+  Q_UNUSED(refreshPriority)
+
   emit beforeReplot();
-  
-# if QT_VERSION < QT_VERSION_CHECK(4, 8, 0)
-  QTime replotTimer;
-  replotTimer.start();
-# else
-  QElapsedTimer replotTimer;
-  replotTimer.start();
-# endif
-  
-  updateLayout();
-  // draw all layered objects (grid, axes, plottables, items, legend,...) into their buffers:
-  setupPaintBuffers();
-  foreach (QCPLayer *layer, mLayers)
-    layer->drawToPaintBuffer();
-  foreach (QSharedPointer<QCPAbstractPaintBuffer> buffer, mPaintBuffers)
-    buffer->setInvalidated(false);
-  
-  if ((refreshPriority == rpRefreshHint && mPlottingHints.testFlag(QCP::phImmediateRefresh)) || refreshPriority==rpImmediateRefresh)
-    repaint();
-  else
-    update();
-  
-# if QT_VERSION < QT_VERSION_CHECK(4, 8, 0)
-  mReplotTime = replotTimer.elapsed();
-# else
-  mReplotTime = replotTimer.nsecsElapsed()*1e-6;
-# endif
-  if (!qFuzzyIsNull(mReplotTimeAverage))
-    mReplotTimeAverage = mReplotTimeAverage*0.9 + mReplotTime*0.1; // exponential moving average with a time constant of 10 last replots
-  else
-    mReplotTimeAverage = mReplotTime; // no previous replots to average with, so initialize with replot time
-  
   emit afterReplot();
-  mReplotting = false;
 }
 
 /*!

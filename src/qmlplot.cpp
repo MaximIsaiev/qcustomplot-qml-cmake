@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QtGlobal>
+#include <QtConcurrent/QtConcurrent>
 #include "include/qmlplot.h"
 #include "include/qcustomplot.h"
 #include "memory"
@@ -13,6 +14,9 @@ CustomPlotItem::CustomPlotItem( QQuickItem* parent ) : QQuickPaintedItem( parent
 
     connect( this, &QQuickPaintedItem::widthChanged, this, &CustomPlotItem::updateCustomPlotSize );
     connect( this, &QQuickPaintedItem::heightChanged, this, &CustomPlotItem::updateCustomPlotSize );
+    connect(&m_futureWatcher, &QFutureWatcher<void>::finished, this, [this](){
+        emit needCustomReplot();
+    });
 }
 
 CustomPlotItem::~CustomPlotItem()
@@ -47,7 +51,7 @@ void CustomPlotItem::initCustomPlot()
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
     connect(this, &CustomPlotItem::needData, this, &CustomPlotItem::realtimeDataSlot);
     connect(this, &CustomPlotItem::needCustomReplot, this, [this](){
-        m_CustomPlot->replot(QCustomPlot::rpQueuedReplot);
+        emit m_CustomPlot->afterReplot();
         dataTimer.start(0);
     });
     connect(&dataTimer, &QTimer::timeout, this, [this](){
@@ -56,6 +60,7 @@ void CustomPlotItem::initCustomPlot()
     });
     // добавляем возможность делать зум и выбирать элементы
     m_CustomPlot->setInteractions(QCP::iRangeZoom | QCP::iRangeDrag);
+    m_CustomPlot->setSelectionRectMode(QCP::srmZoom);
 
     // ресайзим график
     updateCustomPlotSize();
@@ -69,6 +74,7 @@ void CustomPlotItem::paint(bool paint)
 {
     m_needPaint = paint;
     emit needData();
+
 }
 
 
@@ -159,6 +165,7 @@ void CustomPlotItem::onCustomReplot()
 
 void CustomPlotItem::realtimeDataSlot()
 {
+    QFuture<void> future = QtConcurrent::run([this](){
     if (!m_needPaint)
         return;
 
@@ -191,7 +198,9 @@ void CustomPlotItem::realtimeDataSlot()
         i++;
     }
 
-    emit needCustomReplot();
+    });
+
+    m_futureWatcher.setFuture(future);
 }
 
 const QString &CustomPlotItem::replotTime() const {
@@ -246,5 +255,10 @@ void CustomPlotItem::setPointCount(int mPointCount)
 {
     m_pointCount = mPointCount;
     emit pointCountChanged();
+}
+
+void CustomPlotItem::replot()
+{
+    m_CustomPlot->replot();
 }
 
